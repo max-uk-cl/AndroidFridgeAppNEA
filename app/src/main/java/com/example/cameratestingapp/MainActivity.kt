@@ -1,11 +1,9 @@
 package com.example.cameratestingapp
 
 import android.content.pm.PackageManager
-import android.media.Image
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -18,10 +16,9 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.cameratestingapp.Constants.TAG
+import com.chaquo.python.Python
+import com.chaquo.python.android.AndroidPlatform
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -99,10 +96,22 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         )
+        turnPhotoToCode()
     }
 
+    private fun turnPhotoToCode() {
+        if (! Python.isStarted()) {
+            Python.start( AndroidPlatform(this));}
+
+        val python = Python.getInstance()
+        val pythonFile = python.getModule("photoToCode")
+        val photoFile = File(outputDirectory, "productCode.jpg")
+        val code = pythonFile.callAttr("BarcodeReader", photoFile.toString()).toString()
+        Toast.makeText(this, "Turning photo to code", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, code, Toast.LENGTH_LONG).show()
 
 
+    }
     private fun startCamera() {
 
         val cameraProviderFuture = ProcessCameraProvider
