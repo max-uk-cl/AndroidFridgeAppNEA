@@ -65,10 +65,11 @@ class MainActivity : AppCompatActivity() {
         return if (mediaDir != null && mediaDir.exists())
             mediaDir else filesDir
     }
-    private fun takePhoto(){
-        val imageCapture = imageCapture?:return
+    private fun takePhoto() {
+        val imageCapture = imageCapture ?: return
         val photoFile = File(
-            outputDirectory,"productCode.jpg")
+            outputDirectory, "productCode.jpg"
+        )
 
 
         val outputOption = ImageCapture
@@ -79,26 +80,22 @@ class MainActivity : AppCompatActivity() {
 
         imageCapture.takePicture(
             outputOption, ContextCompat.getMainExecutor(this),
-            object : ImageCapture.OnImageSavedCallback{
+            object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-
-                    val savedUri = Uri.fromFile(photoFile)
-                    val msg = "Photo Saved"
-
-                    Toast.makeText(this@MainActivity,
-                        "$msg $savedUri",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    turnPhotoToCode()
                 }
 
                 override fun onError(exception: ImageCaptureException) {
-                    Log.e(Constants.TAG,"onError: ${exception.message}", exception)
+                    Log.e(Constants.TAG, "onError: ${exception.message}", exception)
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Photo Failed",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         )
-        turnPhotoToCode()
     }
-
     private fun turnPhotoToCode() {
         if (! Python.isStarted()) {
             Python.start( AndroidPlatform(this));}
