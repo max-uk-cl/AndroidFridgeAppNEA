@@ -18,7 +18,13 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.chaquo.python.Python
 import com.chaquo.python.android.AndroidPlatform
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
+import java.lang.StringBuilder
+import java.net.HttpURLConnection
+import java.net.URI
+import java.net.URL
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -26,6 +32,8 @@ class MainActivity : AppCompatActivity() {
     private var imageCapture: ImageCapture? = null
 
     private lateinit var  outputDirectory: File
+
+    val apiUrl = "placeholder" //api endpoint
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,8 +90,9 @@ class MainActivity : AppCompatActivity() {
             outputOption, ContextCompat.getMainExecutor(this),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    turnPhotoToCode()
-                }
+                    val code = turnPhotoToCode()
+                    requestAPI(code)
+                    }
 
                 override fun onError(exception: ImageCaptureException) {
                     Log.e(Constants.TAG, "onError: ${exception.message}", exception)
@@ -96,7 +105,7 @@ class MainActivity : AppCompatActivity() {
             }
         )
     }
-    private fun turnPhotoToCode() {
+    private fun turnPhotoToCode(): String {
         if (! Python.isStarted()) {
             Python.start( AndroidPlatform(this));}
 
@@ -106,8 +115,41 @@ class MainActivity : AppCompatActivity() {
         val code = pythonFile.callAttr("BarcodeReader", photoFile.toString()).toString()
         Toast.makeText(this, "Turning photo to code", Toast.LENGTH_SHORT).show()
         Toast.makeText(this, code, Toast.LENGTH_LONG).show()
+        return code
 
 
+    }
+    private fun requestAPI(code:String) {
+        try {
+            val url : URL = URI.create(apiUrl).toURL()
+            val connection :HttpURLConnection = url.openConnection() as HttpURLConnection
+
+            connection.requestMethod = "POST"
+
+            val responseCode: Int = connection.responseCode
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                val reader: BufferedReader =
+                    BufferedReader(InputStreamReader(connection.inputStream))
+                var line: String?
+                val response = StringBuilder()
+
+                while (reader.readLine().also { line = it } != null) {
+                    response.append(line)
+                }
+
+                reader.close()
+            }else {
+                Toast.makeText(
+                    this@MainActivity,
+                    "Error, Unable to fetch API data",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            connection.disconnect()
+        } catch (e: Exception){
+            e.printStackTrace()
+        }
     }
     private fun startCamera() {
 

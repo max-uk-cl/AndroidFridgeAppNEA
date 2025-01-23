@@ -16,7 +16,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        ndk {
+        ndk{
             abiFilters.addAll(listOf("armeabi-v7a", "x86_64"))
         }
     }
@@ -40,18 +40,7 @@ android {
         jvmTarget = "11"
     }
 }
-chaquopy {
-    defaultConfig {
-        buildPython("C:/Users/carlo/AppData/Local/Programs/Python/Python312/python.exe")
-        pip {
-            install("opencv-python")
-            install("pyzbar")
-            install("pillow")
-        }
-    }
-    productFlavors { }
-    sourceSets { }
-}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
