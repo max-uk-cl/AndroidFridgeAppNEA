@@ -101,12 +101,12 @@ class MainActivity : AppCompatActivity() {
             Python.start( AndroidPlatform(this));}
 
         val python = Python.getInstance()
-        val pythonFile = python.getModule("photoToCode")
+        val pythonFileCode = python.getModule("photoToCode")
+        val pythonFileProductInfo = python.getModule("apicall")
         val photoFile = File(outputDirectory, "productCode.jpg")
-        val code = pythonFile.callAttr("BarcodeReader", photoFile.toString()).toString()
-        Toast.makeText(this, "Turning photo to code", Toast.LENGTH_SHORT).show()
-        Toast.makeText(this, code, Toast.LENGTH_LONG).show()
-
+        val code = pythonFileCode.callAttr("BarcodeReader", photoFile.toString()).toString()
+        val okMessage = pythonFileProductInfo.callAttr("ProductInfo", code).toString()
+        Toast.makeText(this@MainActivity, okMessage,  Toast.LENGTH_SHORT).show()
 
     }
     private fun startCamera() {

@@ -47,6 +47,8 @@ chaquopy {
             install("opencv-python")
             install("pyzbar")
             install("pillow")
+            install("requests")
+
         }
     }
     productFlavors { }
