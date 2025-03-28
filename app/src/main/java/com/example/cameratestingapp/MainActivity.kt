@@ -1,9 +1,10 @@
 package com.example.cameratestingapp
 
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -27,6 +28,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var  outputDirectory: File
 
+    private lateinit var openCameraBtn: Button
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -34,7 +38,7 @@ class MainActivity : AppCompatActivity() {
 
         outputDirectory = getOutputDirectory()
         if (allPermissionGranted()) {
-            startCamera()
+            // pass
         } else {
             ActivityCompat.requestPermissions(
                 this, Constants.REQUIRED_PERMISSIONS,
@@ -47,10 +51,22 @@ class MainActivity : AppCompatActivity() {
             insets
 
         }
-
+        binding.GetFridge.setOnClickListener {
+            getFridgeContents()
+            Toast.makeText(this@MainActivity, "Fridge Contents Refreshed",  Toast.LENGTH_SHORT).show()
+        }
 
         binding.btnTakePhoto.setOnClickListener {
             takePhoto()
+
+        }
+        openCameraBtn = findViewById(R.id.OpenCameraBtn)
+        openCameraBtn.setOnClickListener {
+            startCamera()
+            openCameraBtn.visibility = View.GONE
+            binding.GetFridge.visibility = View.GONE
+            binding.viewFinder.visibility = View.VISIBLE
+            binding.btnTakePhoto.visibility = View.VISIBLE
 
         }
     }
@@ -64,6 +80,16 @@ class MainActivity : AppCompatActivity() {
 
         return if (mediaDir != null && mediaDir.exists())
             mediaDir else filesDir
+    }
+    private fun getFridgeContents() {
+        if (! Python.isStarted()) {
+            Python.start( AndroidPlatform(this));}
+        val python = Python.getInstance()
+        val pythonFileFridgeContents = python.getModule("fridgeContentsGet")
+        pythonFileFridgeContents.callAttr("FridgeContents")
+
+
+
     }
     private fun takePhoto() {
         val imageCapture = imageCapture ?: return
@@ -109,6 +135,7 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this@MainActivity, okMessage,  Toast.LENGTH_SHORT).show()
 
     }
+
     private fun startCamera() {
 
         val cameraProviderFuture = ProcessCameraProvider
@@ -142,7 +169,6 @@ class MainActivity : AppCompatActivity() {
             }
         }, ContextCompat.getMainExecutor(this))
     }
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
