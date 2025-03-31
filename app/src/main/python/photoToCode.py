@@ -4,7 +4,7 @@ def BarcodeReader(image):
     img = cv2.imread(image)
     detectedBarcodes = decode(img)
     if not detectedBarcodes:
-        whooops = "meow"
+        whooops = "error"
         return whooops
     else:
 
@@ -21,4 +21,7 @@ def BarcodeReader(image):
                       (255, 0, 0), 2)
 
             if barcode.data!="":
-                return barcode.data
+                code = barcode.data
+                prodcode = str(code)
+                prodcode = prodcode[2:len(prodcode)-1]
+                return prodcode

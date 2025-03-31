@@ -80,4 +80,5 @@ dependencies {
     implementation(libs.androidx.camera.mlkit.vision)
     // If you want to additionally use the CameraX Extensions library
     implementation(libs.androidx.camera.extensions)
+    implementation("com.github.alcarazolabs:FastTAbleLayout:1.0.0")
 }

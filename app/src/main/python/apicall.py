@@ -21,14 +21,17 @@ from time import sleep
 
     #return response
 
-url_base = "http://casep.servegame.com:5000/api/get/7622300315283"
+url_base = "http://casep.servegame.com:5000/api/get/"
 def ProductInfo(ProductCode):
-    with requests.get(url_base, stream=True,timeout=10) as r:
+    url_update = url_base + str(ProductCode)
+    ProductName = ""
+    with requests.get(url_update, stream=True,timeout=10) as r:
         sleep(0.3)
-        print("response: ", r)
-        print("headers:", r.headers)
         data=json.loads(r.content)
         for key in data:
-            print(key + " : " + str(data[key]))
+            if key == "Name":
+                ProductName = str(data[key])
+    print("Product name" ,ProductName)
+    return  ProductName
 
 
